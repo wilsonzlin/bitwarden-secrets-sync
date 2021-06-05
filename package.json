@@ -1,5 +1,5 @@
 {
-  "name": "bitwarden-secrets-sync",
+  "name": "bwss",
   "description": "Sync keys, certs, configs, and other secret files using Bitwarden",
   "version": "0.0.1",
   "main": "index.js",
@@ -16,8 +16,7 @@
   },
   "dependencies": {
     "chalk": "^4.1.1",
-    "luxon": "^1.27.0",
-    "sacli": "^3.0.0"
+    "luxon": "^1.27.0"
   },
   "devDependencies": {
     "prettier": "^2.3.1"

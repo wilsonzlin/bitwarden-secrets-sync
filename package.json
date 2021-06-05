@@ -1,0 +1,25 @@
+{
+  "name": "bitwarden-secrets-sync",
+  "description": "Sync keys, certs, configs, and other secret files using Bitwarden",
+  "version": "0.0.1",
+  "main": "index.js",
+  "bin": "bwss",
+  "files": [
+    "*.js"
+  ],
+  "repository": "https://github.com/wilsonzlin/bitwarden-secrets-sync",
+  "author": "Wilson Lin <npm@wilsonl.in>",
+  "license": "ISC",
+  "scripts": {
+    "format": "prettier --write '*.js'",
+    "prepublishOnly": "prettier --check '*.js'"
+  },
+  "dependencies": {
+    "chalk": "^4.1.1",
+    "luxon": "^1.27.0",
+    "sacli": "^3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.3.1"
+  }
+}

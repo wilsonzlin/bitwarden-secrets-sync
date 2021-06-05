@@ -190,7 +190,7 @@ for (const item of items) {
   switch (action) {
     case "pull":
       console.info(`Pulling ${name}...`);
-      fs.writeFileSync(name, upData);
+      fs.writeFileSync(name, upData, { mode: 0o400 });
       cp.execFileSync("touch", ["-t", upTs.toFormat("yyyyMMddHHmm.ss"), name]);
       break;
     case "push":

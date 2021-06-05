@@ -1,13 +1,13 @@
 {
   "name": "bwss",
   "description": "Sync keys, certs, configs, and other secret files using Bitwarden",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js",
   "bin": "bwss",
   "files": [
     "*.js"
   ],
-  "repository": "https://github.com/wilsonzlin/bitwarden-secrets-sync",
+  "repository": "https://github.com/wilsonzlin/bwss",
   "author": "Wilson Lin <npm@wilsonl.in>",
   "license": "ISC",
   "scripts": {

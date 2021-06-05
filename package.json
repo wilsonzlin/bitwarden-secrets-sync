@@ -1,7 +1,7 @@
 {
   "name": "bwss",
   "description": "Sync keys, certs, configs, and other secret files using Bitwarden",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "index.js",
   "bin": "index.js",
   "files": [

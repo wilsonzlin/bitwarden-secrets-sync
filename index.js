@@ -8,7 +8,15 @@ const luxon = require("luxon");
 const os = require("os");
 const zlib = require("zlib");
 
-const BW_FOLDER_NAME = "bwss";
+const BW_FOLDER_NAME = fs.existsSync(".bwss")
+  ? fs.readFileSync(".bwss", "utf-8").trim()
+  : "bwss";
+if (!BW_FOLDER_NAME) {
+  throw new Error(
+    `.bwss file is empty; its contents is used as the Bitwarden folder name`
+  );
+}
+console.info("Using folder name:", BW_FOLDER_NAME);
 
 const dir = process.cwd();
 

@@ -2,11 +2,21 @@
 
 const chalk = require("chalk");
 const cp = require("child_process");
-const crypto = require("crypto");
 const fs = require("fs");
 const luxon = require("luxon");
+const minimatch = require("minimatch");
 const os = require("os");
-const zlib = require("zlib");
+const {
+  bw,
+  bwJson,
+  compress,
+  confirm,
+  decompress,
+  formatSize,
+  formatTs,
+  hash,
+  jsonb64,
+} = require("./util");
 
 const BW_FOLDER_NAME = fs.existsSync(".bwss")
   ? fs.readFileSync(".bwss", "utf-8").trim()
@@ -18,82 +28,15 @@ if (!BW_FOLDER_NAME) {
 }
 console.info("Using folder name:", BW_FOLDER_NAME);
 
-const dir = process.cwd();
-
-const jsonb64 = (obj) => Buffer.from(JSON.stringify(obj)).toString("base64");
-
-const compress = (raw) =>
-  zlib.brotliCompressSync(raw, {
-    params: {
-      [zlib.constants.BROTLI_PARAM_QUALITY]: zlib.constants.BROTLI_MAX_QUALITY,
-      [zlib.constants.BROTLI_PARAM_SIZE_HINT]: raw.length,
-    },
-  });
-
-const decompress = (compressed) => zlib.brotliDecompressSync(compressed);
-
-const hash = (bytes) => crypto.createHash("sha512").update(bytes).digest("hex");
-
-const formatTs = (dt) =>
-  dt.toLocaleString(luxon.DateTime.DATETIME_MED_WITH_WEEKDAY);
-const formatSize = (bytes) => {
-  let size = bytes;
-  for (const suffix of ["", "K", "M"]) {
-    if (size < 1024) {
-      return `${Math.round(size * 100) / 100} ${suffix}B`;
-    }
-    size /= 100;
-  }
-  return "Too large for Bitwarden";
-};
+const ignorePatterns = fs.existsSync(".bwssignore")
+  ? fs
+      .readFileSync(".bwssignore", "utf-8")
+      .split(/[\r\n]+/)
+      .map((p) => p.trimEnd())
+      .filter((l) => l && !l.startsWith("#"))
+  : [];
 
 let bwSession;
-const bw = (...args) => {
-  console.info(
-    chalk.dim(
-      "+ bw " +
-        args.map((a) => (a.length > 10 ? a.slice(0, 7) + "..." : a)).join(" ")
-    )
-  );
-  try {
-    return cp
-      .execFileSync("bw", args, {
-        encoding: "utf8",
-        stdio: ["inherit", "pipe", "inherit"],
-        cwd: dir,
-        env: {
-          ...process.env,
-          BW_SESSION: bwSession,
-        },
-      })
-      .trim();
-  } catch (e) {
-    console.error(chalk.red("Command failed. Output from Bitwarden:"));
-    console.error(e.output[1]);
-    process.exit(1);
-  }
-};
-
-const bwJson = (...args) => {
-  const out = bw(...args);
-  try {
-    return JSON.parse(out);
-  } catch (e) {
-    console.error(
-      chalk.red("Command did not output JSON. Output from Bitwarden:")
-    );
-    console.error(out);
-    process.exit(1);
-  }
-};
-
-const confirm = (q) => {
-  process.stdout.write(chalk.inverse(q));
-  process.stdout.write(" ");
-  const response = Buffer.alloc(16);
-  const responseLen = fs.readSync(0, response);
-  return response.slice(0, responseLen).toString().trim().toLowerCase();
-};
 
 const UNLOCK_STDOUT_SESSION_LINE_PREFIX = "$ export BW_SESSION=";
 bwSession = (() => {
@@ -127,7 +70,18 @@ const bwFolderId = (() => {
   ).id;
 })();
 
-const localRemaining = new Set(fs.readdirSync(dir));
+const localRemaining = new Set(
+  fs.readdirSync(".").filter((f) => {
+    const st = fs.lstatSync(f);
+    // We don't support folders.
+    // We don't support symlinks as the user is unlikely to want to sync them, as they won't be symlinks once it's downloaded (on same or other device). It's possible the literal link path should be synced, but we don't support that.
+    return (
+      st.isFile() &&
+      f != ".bwss" &&
+      !ignorePatterns.some((p) => minimatch(f, p))
+    );
+  })
+);
 const localEmpty = !localRemaining.size;
 if (localEmpty) {
   console.info("It looks like this is a new client");

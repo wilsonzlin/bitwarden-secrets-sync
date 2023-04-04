@@ -5,6 +5,25 @@ const fs = require("fs");
 const luxon = require("luxon");
 const zlib = require("zlib");
 
+let bwSession;
+const UNLOCK_STDOUT_SESSION_LINE_PREFIX = "$ export BW_SESSION=";
+bwSession = (() => {
+  if (process.env.BW_SESSION) {
+    // TODO This value might be invalid/out of date.
+    return process.env.BW_SESSION;
+  }
+  const out = bw("unlock");
+  const line = out
+    .split(os.EOL)
+    .find((l) => l.startsWith(UNLOCK_STDOUT_SESSION_LINE_PREFIX));
+  if (!line) {
+    console.error(chalk.red("Session not found. Output from Bitwarden:"));
+    console.error(out);
+    process.exit(1);
+  }
+  return line.slice(UNLOCK_STDOUT_SESSION_LINE_PREFIX.length + 1, -1);
+})();
+
 const jsonb64 = (obj) => Buffer.from(JSON.stringify(obj)).toString("base64");
 
 const compress = (raw) =>

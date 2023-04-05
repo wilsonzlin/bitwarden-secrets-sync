@@ -83,7 +83,8 @@ for (const item of items) {
   const localHash = localData && hash(localData);
 
   // One of {pull, push, deleteLocal, deleteRemote, skip}.
-  let action = "skip";
+  // In the past, we used to sync .bwss, but this should be ignored, as it only contains the local configuration state. It would be like committing the `.git` folder.
+  let action = name == ".bwss" ? "deleteRemote" : "skip";
   if (!localStats && localEmpty) {
     action = "pull";
   } else if (!localStats) {

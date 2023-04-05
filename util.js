@@ -3,6 +3,7 @@ const cp = require("child_process");
 const crypto = require("crypto");
 const fs = require("fs");
 const luxon = require("luxon");
+const os = require("os");
 const zlib = require("zlib");
 
 const jsonb64 = (obj) => Buffer.from(JSON.stringify(obj)).toString("base64");

@@ -5,7 +5,6 @@ const cp = require("child_process");
 const fs = require("fs");
 const luxon = require("luxon");
 const minimatch = require("minimatch");
-const os = require("os");
 const {
   bw,
   bwJson,

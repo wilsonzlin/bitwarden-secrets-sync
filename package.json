@@ -17,7 +17,8 @@
   "dependencies": {
     "chalk": "^4.1.1",
     "luxon": "^1.27.0",
-    "minimatch": "^8.0.3"
+    "minimatch": "^8.0.3",
+    "touch": "^3.1.1"
   },
   "devDependencies": {
     "prettier": "2.3.1"

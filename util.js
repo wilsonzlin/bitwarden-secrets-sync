@@ -43,7 +43,7 @@ const bw = (...args) => {
   );
   try {
     return cp
-      .execFileSync("bw", args, {
+      .execFileSync(process.platform == "win32" ? "bw.cmd" : "bw", args, {
         encoding: "utf8",
         stdio: ["inherit", "pipe", "inherit"],
         env: {
@@ -53,8 +53,13 @@ const bw = (...args) => {
       })
       .trim();
   } catch (e) {
-    console.error(chalk.red("Command failed. Output from Bitwarden:"));
-    console.error(e.output[1]);
+    console.error(chalk.red("Command failed:", e.message));
+    // May not exist (e.g. process failed to launch).
+    const output = e.output?.[1];
+    if (output) {
+      console.error(chalk.yellow("Output from Bitwarden:"));
+      console.error(output);
+    }
     process.exit(1);
   }
 };

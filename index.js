@@ -5,6 +5,7 @@ const cp = require("child_process");
 const fs = require("fs");
 const luxon = require("luxon");
 const minimatch = require("minimatch");
+const touch = require("touch");
 const {
   bw,
   bwJson,
@@ -133,8 +134,8 @@ for (const item of items) {
   switch (action) {
     case "pull":
       console.info(`Pulling ${name}...`);
-      fs.writeFileSync(name, upData, { mode: 0o400 });
-      cp.execFileSync("touch", ["-t", upTs.toFormat("yyyyMMddHHmm.ss"), name]);
+      fs.writeFileSync(name, upData, { mode: 0o600 });
+      touch.sync(name, { mtime: upTs });
       break;
     case "push":
       console.info(`Pushing ${name}...`);
